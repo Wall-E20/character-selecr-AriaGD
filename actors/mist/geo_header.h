@@ -1,0 +1,8 @@
+extern const GeoLayout mist_geo[];
+extern Lights1 mist_sm64_F3D_Mat_mist_seg3_dl_03000880_obj_0_lights;
+extern u8 mist_mist_ia16_rgba32[];
+extern Vtx mist_3_mist_geo_display_list_mist_seg3_dl_03000880_mesh_layer_5_vtx_0[4];
+extern Gfx mist_3_mist_geo_display_list_mist_seg3_dl_03000880_mesh_layer_5_tri_0[];
+extern Gfx mat_mist_sm64_F3D_Mat_mist_seg3_dl_03000880_obj_0[];
+extern Gfx mat_revert_mist_sm64_F3D_Mat_mist_seg3_dl_03000880_obj_0[];
+extern Gfx mist_3_mist_geo_display_list_mist_seg3_dl_03000880_mesh_layer_5[];
