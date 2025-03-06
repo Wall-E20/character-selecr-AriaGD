@@ -13,6 +13,11 @@ local E_MODEL_MISTCUSTOM = smlua_model_util_get_id("mist_geo")
 local E_MODEL_GD2 = smlua_model_util_get_id("ariacat_geo")
 local TEX_CUSTOM_STAR_ICON = get_texture_info("exclamation-icon")
 local TEX_CUSTOM_LIFE_ICON = get_texture_info("icon-aria") 
+--E_MODEL_GD is the normal model
+--E_MODEL_GD2 is the alt model with catmouth expression
+--E_MODEL_MISTCUSTOM is the custom particle model (recolorable)
+
+
 
 local CAPTABLE_GD = {
     normal = smlua_model_util_get_id("aria_acc_geo"),
@@ -43,20 +48,6 @@ local E_MODEL_CUSTOM_STAR = smlua_model_util_get_id("panino_geo")
     }
 }
 ]]
---[[
---particles yay!!
-local function walk_particles(o)
-o.oFlags = (ACTIVE_PARTICLE_DUST | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE)
-obj_set_model_extended(obj, E_MODEL_MISTCUSTOM)
-end
-if m.action == (ACT_RUNNING) then
-        m.particleFlags = m.particleFlags | PARTICLE_FIRE
-		
-end
-
---]]
-hook_behavior(id_bhvSignOnWall, OBJ_LIST_SURFACE, false, holo_sign_init, holo_sign_loop, "bhvSignOnWall")
-
 local PALETTE_GD = {
     [PANTS]  = { r = 21, g = 44, b = 179 },
     [SHIRT]  = { r = 255, g = 150, b = 0 },
@@ -76,11 +67,11 @@ local VOICETABLE_GD = {
 	[CHAR_SOUND_WAH2] = 'wah2.ogg',
 	[CHAR_SOUND_WHOA] = 'woah.ogg',
 	[CHAR_SOUND_EEUH] = 'eeuh.ogg',
-	[CHAR_SOUND_ATTACKED] = 'hurt.ogg',]]
-	--[CHAR_SOUND_OOOF] = 'ah...ogg',
-	--[CHAR_SOUND_OOOF2] = 'Ah.ogg',
-	--[CHAR_SOUND_HERE_WE_GO] = 'Ben Fatto!.ogg',
-	--[[[CHAR_SOUND_YAWNING] = 'yawn.ogg',
+	[CHAR_SOUND_ATTACKED] = 'hurt.ogg',
+	[CHAR_SOUND_OOOF] = 'ah...ogg',
+	[CHAR_SOUND_OOOF2] = 'Ah.ogg',
+	[CHAR_SOUND_HERE_WE_GO] = 'Ben Fatto!.ogg',
+	[CHAR_SOUND_YAWNING] = 'yawn.ogg',
 	[CHAR_SOUND_SNORING1] = 'uh.ogg',
 	[CHAR_SOUND_SNORING2] = 'uh.ogg',
 	[CHAR_SOUND_WAAAOOOW] = 'woah.ogg',
@@ -96,22 +87,23 @@ local VOICETABLE_GD = {
 	[CHAR_SOUND_COUGHING2] = 'doh.ogg',
 	[CHAR_SOUND_COUGHING3] = 'doh.ogg',
 	[CHAR_SOUND_PUNCH_YAH] = 'yah.ogg',
-	[CHAR_SOUND_PUNCH_HOO] = 'hoo.ogg',]]
-	--[CHAR_SOUND_MAMA_MIA] = 'aww....ogg',
-	--[[[CHAR_SOUND_GROUND_POUND_WAH] = 'wah.ogg',
+	[CHAR_SOUND_PUNCH_HOO] = 'hoo.ogg',
+	[CHAR_SOUND_MAMA_MIA] = 'aww....ogg',
+	[CHAR_SOUND_GROUND_POUND_WAH] = 'wah.ogg',
 	[CHAR_SOUND_DROWNING] = 'uh.ogg',
 	[CHAR_SOUND_PUNCH_WAH] = 'wah.ogg',
 	[CHAR_SOUND_YAHOO_WAHA_YIPPEE] = 'yahoo.ogg', 'waha.ogg', 'yippie.ogg',
-	[CHAR_SOUND_DOH] = 'doh.ogg',]]
-	--[CHAR_SOUND_GAME_OVER] = 'gameover.ogg',
-	--[CHAR_SOUND_HELLO] = 'Ciao ragazzi.ogg',
-	--[[CHAR_SOUND_PRESS_START_TO_PLAY] = 'press_start.ogg',
+	[CHAR_SOUND_DOH] = 'doh.ogg',
+	[CHAR_SOUND_GAME_OVER] = 'gameover.ogg',
+	[CHAR_SOUND_HELLO] = 'Ciao ragazzi.ogg',
+	[CHAR_SOUND_PRESS_START_TO_PLAY] = 'press_start.ogg',
 	[CHAR_SOUND_TWIRL_BOUNCE] = 'boing.ogg',
 	[CHAR_SOUND_SNORING3] = 'uh.ogg',
 	[CHAR_SOUND_SO_LONGA_BOWSER] = 'so_long.ogg',
-	[CHAR_SOUND_IMA_TIRED] = 'imma_tired.ogg',]]
-	--[CHAR_SOUND_LETS_A_GO] = 'ok.ogg',
-	--[CHAR_SOUND_OKEY_DOKEY] = 'ok.ogg',
+	[CHAR_SOUND_IMA_TIRED] = 'imma_tired.ogg',
+	[CHAR_SOUND_LETS_A_GO] = 'ok.ogg',
+	[CHAR_SOUND_OKEY_DOKEY] = 'ok.ogg',
+	--]]
 }
 local CSloaded = false
 local function on_character_select_load()
@@ -140,6 +132,7 @@ local SKIN_CATARIA = {
     CSloaded = true
 
 end
+--this is for secondary palette, is not added yet
 --[[
 local function on_character_select_load2()
 _G.charSelect.character_add_palette_preset(E_MODEL_GD2, PALETTE_GD)
@@ -162,7 +155,7 @@ hook_event(HOOK_MARIO_UPDATE, on_character_snore)
 
 --single jump / no long jump
 local function replace_jump(m, inc)
-if _G.charSelect.character_get_voice(m) == VOICETABLE_GD then
+if CT_GD == _G.charSelect.character_get_current_number() and m.playerIndex == 0 then
 	if inc == ACT_JUMP or inc == ACT_TRIPLE_JUMP or inc == ACT_LONG_JUMP then
 	
         return ACT_DOUBLE_JUMP
@@ -174,7 +167,7 @@ hook_event(HOOK_BEFORE_SET_MARIO_ACTION, replace_jump)
 
 --land (gotta fix this)
 local function jump2(m)
-if _G.charSelect.character_get_voice(m) == VOICETABLE_GD then
+if CT_GD == _G.charSelect.character_get_current_number() and m.playerIndex == 0 then
 	if m.marioObj.header.gfx.animInfo.animID == MARIO_ANIM_GENERAL_LAND or 
 	m.marioObj.header.gfx.animInfo.animID == MARIO_ANIM_LAND_FROM_SINGLE_JUMP or 
 	m.marioObj.header.gfx.animInfo.animID == MARIO_ANIM_LAND_FROM_DOUBLE_JUMP or 
@@ -190,9 +183,9 @@ hook_event(HOOK_MARIO_UPDATE, jump2)
 
 
 
---standard anims
+--Face expressions for the animations and animation replacing
 local function anims(m)
-    if _G.charSelect.character_get_voice(m) == VOICETABLE_GD then
+    if CT_GD == _G.charSelect.character_get_current_number() and m.playerIndex == 0 then
         if m.marioObj.header.gfx.animInfo.animID ==  MARIO_ANIM_IDLE_HEAD_LEFT then
             m.marioBodyState.eyeState = MARIO_EYES_LOOK_LEFT
             smlua_anim_util_set_animation(m.marioObj, "idle1")
@@ -323,20 +316,21 @@ local function anims(m)
     end
 end
 
+
+--star animations
 local function star(m)
 if CT_GD == _G.charSelect.character_get_current_number() and m.playerIndex == 0 and
 	m.marioObj.header.gfx.animInfo.animID == MARIO_ANIM_STAR_DANCE or m.marioObj.header.gfx.animInfo.animID == MARIO_ANIM_WATER_STAR_DANCE and
 	m.marioObj.header.gfx.animInfo.animFrame > 40 then
 			m.marioBodyState.eyeState = 10
-		end
-
+	end
 
 if CT_GD == _G.charSelect.character_get_current_number() and m.playerIndex == 0 and
 	m.marioObj.header.gfx.animInfo.animID == MARIO_ANIM_STAR_DANCE or m.marioObj.header.gfx.animInfo.animID == MARIO_ANIM_WATER_STAR_DANCE and
 	m.marioObj.header.gfx.animInfo.animFrame < 40 then
 			m.marioBodyState.eyeState = 9
-		end
 	end
+end
 
 hook_event(HOOK_MARIO_UPDATE, anims)
 hook_event(HOOK_MARIO_UPDATE, star)
@@ -350,6 +344,8 @@ local get_options_status = _G.charSelect.get_options_status
 local get_menu_color = _G.charSelect.get_menu_color
 local hook_render_in_menu = _G.charSelect.hook_render_in_menu
 
+
+--menu pose!!
 local function menupose(m)
 if _G.charSelect.is_menu_open() and
  CT_GD == _G.charSelect.character_get_current_number() and m.playerIndex == 0  then
