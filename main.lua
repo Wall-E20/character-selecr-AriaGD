@@ -85,7 +85,7 @@ local PALETTE_GD_MIRROR = {
     [SHOES]  = { r = 130, g = 130, b = 130 },
     [HAIR]   = { r = 255, g = 185, b = 0 },
     [SKIN]   = { r = 192, g = 139, b = 86 },
-    [CAP]    = { r = 0, g = 187, b = 92 },
+    [CAP]    = { r = 187, g = 136, b = 0 },
     [EMBLEM] = { r = 102, g = 49, b = 30 }
 }
 
