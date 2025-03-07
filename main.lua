@@ -79,10 +79,10 @@ local PALETTE_GD_BW = {
     [EMBLEM] = { r = 130, g = 130, b = 130 }
 }
 local PALETTE_GD_MIRROR = {
-    [PANTS]  = { r = 0, g = 100, b = 150 },
+    [PANTS]  = { r = 130, g = 130, b = 130  },
     [SHIRT]  = { r = 0, g = 255, b = 125 },
     [GLOVES] = { r = 255, g = 185, b = 0 },
-    [SHOES]  = { r = 130, g = 130, b = 130 },
+    [SHOES]  = { r = 0, g = 100, b = 150  },
     [HAIR]   = { r = 255, g = 185, b = 0 },
     [SKIN]   = { r = 192, g = 139, b = 86 },
     [CAP]    = { r = 187, g = 136, b = 0 },
