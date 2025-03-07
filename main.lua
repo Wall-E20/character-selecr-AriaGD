@@ -11,7 +11,7 @@ end
 local E_MODEL_GD = smlua_model_util_get_id("aria_geo")
 local E_MODEL_MISTCUSTOM = smlua_model_util_get_id("mist_geo")
 local E_MODEL_GD2 = smlua_model_util_get_id("ariacat_geo")
-local TEX_CUSTOM_STAR_ICON = get_texture_info("exclamation-icon")
+local TEX_CUSTOM_STAR_ICON = get_texture_info("pane-icon")
 local TEX_CUSTOM_LIFE_ICON = get_texture_info("icon-aria") 
 
 local CAPTABLE_GD = {
