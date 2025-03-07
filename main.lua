@@ -58,15 +58,39 @@ end
 hook_behavior(id_bhvSignOnWall, OBJ_LIST_SURFACE, false, holo_sign_init, holo_sign_loop, "bhvSignOnWall")
 
 local PALETTE_GD = {
-    [PANTS]  = { r = 21, g = 44, b = 179 },
-    [SHIRT]  = { r = 255, g = 150, b = 0 },
-    [GLOVES] = { r = 0, g = 200, b = 99 },
-    [SHOES]  = { r = 122, g = 51, b = 0 },
-    [HAIR]   = { r = 77, g = 218, b = 129 },
+    [PANTS]  = { r = 0, g = 100, b = 150 },
+    [SHIRT]  = { r = 255, g = 185, b = 0 },
+    [GLOVES] = { r = 0, g = 255, b = 125 },
+    [SHOES]  = { r = 102, g = 49, b = 30 },
+    [HAIR]   = { r = 0, g = 255, b = 125 },
     [SKIN]   = { r = 192, g = 139, b = 86 },
-    [CAP]    = { r = 0, g = 145, b = 95 },
-    [EMBLEM] = { r = 67, g = 74, b = 94 }
+    [CAP]    = { r = 0, g = 187, b = 92 },
+    [EMBLEM] = { r = 130, g = 130, b = 130 }
 }
+--extra palettes
+local PALETTE_GD_BW = {
+    [PANTS]  = { r = 129, g = 129, b = 129 },
+    [SHIRT]  = { r = 140, g = 140, b = 140 },
+    [GLOVES] = { r = 175, g = 175, b = 175 },
+    [SHOES]  = { r = 82, g = 82, b = 82 },
+    [HAIR]   = { r = 175, g = 175, b = 175 },
+    [SKIN]   = { r = 255, g = 255, b = 255 },
+    [CAP]    = { r = 128, g = 128, b = 128 },
+    [EMBLEM] = { r = 130, g = 130, b = 130 }
+}
+local PALETTE_GD_MIRROR = {
+    [PANTS]  = { r = 0, g = 100, b = 150 },
+    [SHIRT]  = { r = 0, g = 255, b = 125 },
+    [GLOVES] = { r = 255, g = 185, b = 0 },
+    [SHOES]  = { r = 130, g = 130, b = 130 },
+    [HAIR]   = { r = 255, g = 185, b = 0 },
+    [SKIN]   = { r = 192, g = 139, b = 86 },
+    [CAP]    = { r = 0, g = 187, b = 92 },
+    [EMBLEM] = { r = 102, g = 49, b = 30 }
+}
+
+--soon...
+
 local VOICETABLE_GD = {
 --[[	[CHAR_SOUND_YAH_WAH_HOO] = 'yah.ogg', 'wah.ogg', 'hoo.ogg',
 	[CHAR_SOUND_HOOHOO] = 'hoo.ogg',
@@ -120,12 +144,16 @@ local function on_character_select_load()
     _G.charSelect.character_add_voice(E_MODEL_GD, VOICETABLE_GD)
     _G.charSelect.character_add_celebration_star(E_MODEL_GD, E_MODEL_CUSTOM_STAR, TEX_CUSTOM_STAR_ICON)
     _G.charSelect.character_add_palette_preset(E_MODEL_GD, PALETTE_GD)
+	_G.charSelect.character_add_palette_preset(E_MODEL_GD, PALETTE_GD_MIRROR)
+	_G.charSelect.character_add_palette_preset(E_MODEL_GD, PALETTE_GD_BW)
     _G.charSelect.character_add_health_meter(CT_GD, healthMeter)
 	
 	_G.charSelect.character_add_caps(E_MODEL_GD2, CAPTABLE_GD)
     _G.charSelect.character_add_voice(E_MODEL_GD2, VOICETABLE_GD)
     _G.charSelect.character_add_celebration_star(E_MODEL_GD2, E_MODEL_CUSTOM_STAR, TEX_CUSTOM_STAR_ICON)
     _G.charSelect.character_add_palette_preset(E_MODEL_GD2, PALETTE_GD)
+	_G.charSelect.character_add_palette_preset(E_MODEL_GD2, PALETTE_GD_MIRROR)
+	_G.charSelect.character_add_palette_preset(E_MODEL_GD2, PALETTE_GD_BW)
     CSloaded = true
 
 --cat mouth :3
@@ -140,11 +168,6 @@ local SKIN_CATARIA = {
     CSloaded = true
 
 end
---[[
-local function on_character_select_load2()
-_G.charSelect.character_add_palette_preset(E_MODEL_GD2, PALETTE_GD)
-end
---]]
 local function on_character_sound(m, sound)
     if not CSloaded then return end
     if _G.charSelect.character_get_voice(m) == VOICETABLE_GD then return _G.charSelect.voice.sound(m, sound) end
@@ -156,7 +179,6 @@ local function on_character_snore(m)
 end
 
 hook_event(HOOK_ON_MODS_LOADED, on_character_select_load)
---hook_event(HOOK_ON_MODS_LOADED, on_character_select_load2)
 hook_event(HOOK_CHARACTER_SOUND, on_character_sound)
 hook_event(HOOK_MARIO_UPDATE, on_character_snore)
 
