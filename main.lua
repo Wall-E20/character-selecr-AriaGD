@@ -13,6 +13,9 @@ local E_MODEL_MISTCUSTOM = smlua_model_util_get_id("mist_geo")
 local E_MODEL_GD2 = smlua_model_util_get_id("ariacat_geo")
 local TEX_CUSTOM_STAR_ICON = get_texture_info("pane-icon")
 local TEX_CUSTOM_LIFE_ICON = get_texture_info("icon-aria") 
+local E_MODEL_CUSTOM_STAR = smlua_model_util_get_id("panino_geo") 
+
+
 
 local CAPTABLE_GD = {
     normal = smlua_model_util_get_id("a_acc_geo"),
@@ -21,7 +24,6 @@ local CAPTABLE_GD = {
     metalWing = smlua_model_util_get_id("a_acc_metal_geo"),
 }
 
-local E_MODEL_CUSTOM_STAR = smlua_model_util_get_id("panino_geo") 
 
 
 -- All Located in "textures"
@@ -43,19 +45,6 @@ local E_MODEL_CUSTOM_STAR = smlua_model_util_get_id("panino_geo")
     }
 }
 ]]
---[[
---particles yay!!
-local function walk_particles(o)
-o.oFlags = (ACTIVE_PARTICLE_DUST | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE)
-obj_set_model_extended(obj, E_MODEL_MISTCUSTOM)
-end
-if m.action == (ACT_RUNNING) then
-        m.particleFlags = m.particleFlags | PARTICLE_FIRE
-		
-end
-
---]]
-hook_behavior(id_bhvSignOnWall, OBJ_LIST_SURFACE, false, holo_sign_init, holo_sign_loop, "bhvSignOnWall")
 
 local PALETTE_GD = {
     [PANTS]  = { r = 0, g = 100, b = 150 },
@@ -64,7 +53,7 @@ local PALETTE_GD = {
     [SHOES]  = { r = 102, g = 49, b = 30 },
     [HAIR]   = { r = 0, g = 255, b = 125 },
     [SKIN]   = { r = 192, g = 139, b = 86 },
-    [CAP]    = { r = 0, g = 187, b = 92 },
+    [CAP]    = { r = 8, g = 195, b = 97 },
     [EMBLEM] = { r = 130, g = 130, b = 130 }
 }
 --extra palettes
@@ -100,11 +89,11 @@ local VOICETABLE_GD = {
 	[CHAR_SOUND_WAH2] = 'wah2.ogg',
 	[CHAR_SOUND_WHOA] = 'woah.ogg',
 	[CHAR_SOUND_EEUH] = 'eeuh.ogg',
-	[CHAR_SOUND_ATTACKED] = 'hurt.ogg',]]
-	--[CHAR_SOUND_OOOF] = 'ah...ogg',
-	--[CHAR_SOUND_OOOF2] = 'Ah.ogg',
-	--[CHAR_SOUND_HERE_WE_GO] = 'Ben Fatto!.ogg',
-	--[[[CHAR_SOUND_YAWNING] = 'yawn.ogg',
+	[CHAR_SOUND_ATTACKED] = 'hurt.ogg',
+	[CHAR_SOUND_OOOF] = 'ah...ogg',
+	[CHAR_SOUND_OOOF2] = 'Ah.ogg',
+	[CHAR_SOUND_HERE_WE_GO] = 'Ben Fatto!.ogg',
+	[CHAR_SOUND_YAWNING] = 'yawn.ogg',
 	[CHAR_SOUND_SNORING1] = 'uh.ogg',
 	[CHAR_SOUND_SNORING2] = 'uh.ogg',
 	[CHAR_SOUND_WAAAOOOW] = 'woah.ogg',
@@ -120,22 +109,23 @@ local VOICETABLE_GD = {
 	[CHAR_SOUND_COUGHING2] = 'doh.ogg',
 	[CHAR_SOUND_COUGHING3] = 'doh.ogg',
 	[CHAR_SOUND_PUNCH_YAH] = 'yah.ogg',
-	[CHAR_SOUND_PUNCH_HOO] = 'hoo.ogg',]]
-	--[CHAR_SOUND_MAMA_MIA] = 'aww....ogg',
-	--[[[CHAR_SOUND_GROUND_POUND_WAH] = 'wah.ogg',
+	[CHAR_SOUND_PUNCH_HOO] = 'hoo.ogg',
+	[CHAR_SOUND_MAMA_MIA] = 'aww....ogg',
+	[CHAR_SOUND_GROUND_POUND_WAH] = 'wah.ogg',
 	[CHAR_SOUND_DROWNING] = 'uh.ogg',
 	[CHAR_SOUND_PUNCH_WAH] = 'wah.ogg',
 	[CHAR_SOUND_YAHOO_WAHA_YIPPEE] = 'yahoo.ogg', 'waha.ogg', 'yippie.ogg',
-	[CHAR_SOUND_DOH] = 'doh.ogg',]]
-	--[CHAR_SOUND_GAME_OVER] = 'gameover.ogg',
-	--[CHAR_SOUND_HELLO] = 'Ciao ragazzi.ogg',
-	--[[CHAR_SOUND_PRESS_START_TO_PLAY] = 'press_start.ogg',
+	[CHAR_SOUND_DOH] = 'doh.ogg',
+	[CHAR_SOUND_GAME_OVER] = 'gameover.ogg',
+	[CHAR_SOUND_HELLO] = 'Ciao ragazzi.ogg',
+	[CHAR_SOUND_PRESS_START_TO_PLAY] = 'press_start.ogg',
 	[CHAR_SOUND_TWIRL_BOUNCE] = 'boing.ogg',
 	[CHAR_SOUND_SNORING3] = 'uh.ogg',
 	[CHAR_SOUND_SO_LONGA_BOWSER] = 'so_long.ogg',
-	[CHAR_SOUND_IMA_TIRED] = 'imma_tired.ogg',]]
-	--[CHAR_SOUND_LETS_A_GO] = 'ok.ogg',
-	--[CHAR_SOUND_OKEY_DOKEY] = 'ok.ogg',
+	[CHAR_SOUND_IMA_TIRED] = 'imma_tired.ogg',
+	[CHAR_SOUND_LETS_A_GO] = 'ok.ogg',
+	[CHAR_SOUND_OKEY_DOKEY] = 'ok.ogg',
+	--]]
 }
 local CSloaded = false
 local function on_character_select_load()
@@ -168,6 +158,8 @@ local SKIN_CATARIA = {
     CSloaded = true
 
 end
+
+
 local function on_character_sound(m, sound)
     if not CSloaded then return end
     if _G.charSelect.character_get_voice(m) == VOICETABLE_GD then return _G.charSelect.voice.sound(m, sound) end
@@ -178,9 +170,12 @@ local function on_character_snore(m)
     if _G.charSelect.character_get_voice(m) == VOICETABLE_GD then return _G.charSelect.voice.snore(m) end
 end
 
+
 hook_event(HOOK_ON_MODS_LOADED, on_character_select_load)
 hook_event(HOOK_CHARACTER_SOUND, on_character_sound)
 hook_event(HOOK_MARIO_UPDATE, on_character_snore)
+
+
 
 --single jump / no long jump
 local function replace_jump(m, inc)
@@ -193,6 +188,7 @@ end
 end
 
 hook_event(HOOK_BEFORE_SET_MARIO_ACTION, replace_jump)
+
 
 --land (gotta fix this)
 local function jump2(m)
@@ -254,8 +250,7 @@ local function anims(m)
 			m.marioBodyState.eyeState = 11
            --smlua_anim_util_set_animation(m.marioObj, "gd_yay")
         end
-		if --m.marioObj.header.gfx.animInfo.animID == ACT_STAR_DANCE_NO_EXIT or
-			--m.marioObj.header.gfx.animInfo.animID == ACT_STAR_DANCE_WATER or
+		if 
 			m.marioObj.header.gfx.animInfo.animID == MARIO_ANIM_CROUCH_FROM_SLOW_LONGJUMP or
 			m.marioObj.header.gfx.animInfo.animID == MARIO_ANIM_CROUCH_FROM_FAST_LONGJUMP or
 			m.marioObj.header.gfx.animInfo.animID == MARIO_ANIM_SLOW_LONGJUMP or
@@ -265,7 +260,6 @@ local function anims(m)
 			m.marioObj.header.gfx.animInfo.animID == MARIO_ANIM_HANDSTAND_JUMP or
 			m.marioObj.header.gfx.animInfo.animID == MARIO_ANIM_WALK_WITH_LIGHT_OBJ or
 			m.marioObj.header.gfx.animInfo.animID == MARIO_ANIM_SINGLE_JUMP or 
-			--m.marioObj.header.gfx.animInfo.animID == MARIO_ANIM_A_POSE or 
 			m.marioObj.header.gfx.animInfo.animID == MARIO_ANIM_RUN_WITH_LIGHT_OBJ or 
 			m.marioObj.header.gfx.animInfo.animID == MARIO_ANIM_CREDITS_LOOK_UP or 
 			m.marioObj.header.gfx.animInfo.animID == MARIO_ANIM_FINAL_BOWSER_RAISE_HAND_SPIN or 
@@ -311,10 +305,9 @@ local function anims(m)
 			m.marioObj.header.gfx.animInfo.animID == MARIO_ANIM_TRIPLE_JUMP_FLY then
             m.marioBodyState.eyeState = 11
         end
-		if --	m.marioObj.header.gfx.animInfo.animID == MARIO_ANIM_STAR_DANCE or
+		if
 			m.marioObj.header.gfx.animInfo.animID == MARIO_ANIM_CREDITS_WAVING or
-			m.marioObj.header.gfx.animInfo.animID == MARIO_ANIM_CREDITS_PEACE_SIGN or
-			--m.marioObj.header.gfx.animInfo.animID == MARIO_ANIM_WATER_STAR_DANCE or	
+			m.marioObj.header.gfx.animInfo.animID == MARIO_ANIM_CREDITS_PEACE_SIGN or	
 			m.marioObj.header.gfx.animInfo.animID == MARIO_ANIM_RETURN_FROM_WATER_STAR_DANCE then			
             m.marioBodyState.eyeState = 9
         end
