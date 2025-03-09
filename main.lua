@@ -246,9 +246,27 @@ local function anims(m)
             smlua_anim_util_set_animation(m.marioObj, "gd_ffree")
 			m.marioBodyState.eyeState = 11
         end
-		if m.marioObj.header.gfx.animInfo.animID == MARIO_ANIM_TRIPLE_JUMP_LAND then
-			m.marioBodyState.eyeState = 11
-           --smlua_anim_util_set_animation(m.marioObj, "gd_yay")
+		if m.marioObj.header.gfx.animInfo.animID == MARIO_ANIM_START_CROUCHING then
+           smlua_anim_util_set_animation(m.marioObj, "Crouch_start")
+        end
+		if m.marioObj.header.gfx.animInfo.animID == MARIO_ANIM_CROUCHING then
+           smlua_anim_util_set_animation(m.marioObj, "Crouch")
+        end
+		if m.marioObj.header.gfx.animInfo.animID == MARIO_ANIM_STOP_CROUCHING then
+           smlua_anim_util_set_animation(m.marioObj, "Crouch_end")
+        end
+		if m.marioObj.header.gfx.animInfo.animID == MARIO_ANIM_BREAKDANCE then
+           smlua_anim_util_set_animation(m.marioObj, "Crouch_attack")
+        end
+		if m.marioObj.header.gfx.animInfo.animID == MARIO_ANIM_CRAWLING then
+           smlua_anim_util_set_animation(m.marioObj, "Crawl")
+		   m.forwardVel = math.max(m.forwardVel,10)
+        end
+		if m.marioObj.header.gfx.animInfo.animID == MARIO_ANIM_START_CRAWLING then
+           smlua_anim_util_set_animation(m.marioObj, "crawl_frame")
+        end
+		if m.marioObj.header.gfx.animInfo.animID == MARIO_ANIM_STOP_CRAWLING then
+           smlua_anim_util_set_animation(m.marioObj, "crawl_frame")
         end
 		if 
 			m.marioObj.header.gfx.animInfo.animID == MARIO_ANIM_CROUCH_FROM_SLOW_LONGJUMP or
