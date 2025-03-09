@@ -190,6 +190,40 @@ end
 hook_event(HOOK_BEFORE_SET_MARIO_ACTION, replace_jump)
 
 
+--groundpound fix by xxLuigiGamerx (Thankyou!!1)
+function before_set_character_action(m, action)
+    if m.action == ACT_GROUND_POUND_LAND and action == ACT_BUTT_SLIDE_STOP and  _G.charSelect.character_get_current_number() == CT_GD then
+        return ACT_IDLE -- Either return a custom action or skip the action entirely by returning `ACT_IDLE` instead
+    end
+end
+
+hook_event(HOOK_BEFORE_SET_MARIO_ACTION, before_set_character_action)
+
+
+function before_set_character_action(m)
+if m.action == ACT_JUMP_KICK and _G.charSelect.character_get_current_number() == CT_GD then
+			m.vel.y = 30
+			set_mario_action(m, ACT_DIVE, 0)
+end
+end     
+
+hook_event(HOOK_ON_SET_MARIO_ACTION, before_set_character_action)
+
+-- getpack yay
+local function mario_update2(m)
+if _G.charSelect.character_get_current_number() == CT_GD and m.flags & MARIO_WING_CAP ~= 0 and m.action & ACT_FLAG_AIR ~= 0 and m.pos.y ~= m.floorHeight -700 then
+    if m.controller.buttonDown & A_BUTTON ~= 0 then 
+        m.vel.y = 25 
+		m.particleFlags = m.particleFlags | PARTICLE_FIRE
+		set_mario_action(m, ACT_FREEFALL, 0)
+		--m.marioObj.header.gfx.animInfo.animID == MARIO_ANIM_A_POSE
+    end
+end
+end
+-- hooks --
+hook_event(HOOK_MARIO_UPDATE, mario_update2)
+
+
 --land (gotta fix this)
 local function jump2(m)
 if _G.charSelect.character_get_voice(m) == VOICETABLE_GD then
@@ -268,6 +302,18 @@ local function anims(m)
 		if m.marioObj.header.gfx.animInfo.animID == MARIO_ANIM_STOP_CRAWLING then
            smlua_anim_util_set_animation(m.marioObj, "crawl_frame")
         end
+		if m.marioObj.header.gfx.animInfo.animID == MARIO_ANIM_GROUND_POUND then
+           smlua_anim_util_set_animation(m.marioObj, "Spinn")
+        end
+		if m.marioObj.header.gfx.animInfo.animID == MARIO_ANIM_START_GROUND_POUND then
+           smlua_anim_util_set_animation(m.marioObj, "GP_frame")
+        end
+		if m.marioObj.header.gfx.animInfo.animID == MARIO_ANIM_GROUND_POUND_LANDING then
+           smlua_anim_util_set_animation(m.marioObj, "gd_stopreal")
+        end
+		--if m.marioObj.header.gfx.animInfo.animID == MARIO_ANIM_BOTTOM_STUCK_IN_GROUND then
+      --     m.marioObj.header.gfx.animInfo.animID == MARIO_ANIM_LEGS_STUCK_IN_GROUND
+       -- end
 		if 
 			m.marioObj.header.gfx.animInfo.animID == MARIO_ANIM_CROUCH_FROM_SLOW_LONGJUMP or
 			m.marioObj.header.gfx.animInfo.animID == MARIO_ANIM_CROUCH_FROM_FAST_LONGJUMP or
@@ -286,7 +332,6 @@ local function anims(m)
 			m.marioObj.header.gfx.animInfo.animID == MARIO_ANIM_HANG_ON_OWL or 
 			m.marioObj.header.gfx.animInfo.animID == MARIO_ANIM_THROW_CATCH_KEY or 
 			m.marioObj.header.gfx.animInfo.animID == MARIO_ANIM_AIR_KICK or  
-			m.marioObj.header.gfx.animInfo.animID == MARIO_ANIM_GROUND_POUND_LANDING or
 			m.marioObj.header.gfx.animInfo.animID == MARIO_ANIM_IDLE_WITH_LIGHT_OBJ or 
 			m.marioObj.header.gfx.animInfo.animID == MARIO_ANIM_JUMP_WITH_LIGHT_OBJ or 
 			m.marioObj.header.gfx.animInfo.animID == MARIO_ANIM_FALL_WITH_LIGHT_OBJ or 
@@ -305,9 +350,6 @@ local function anims(m)
 			m.marioObj.header.gfx.animInfo.animID == MARIO_ANIM_SLIDE_DIVE or 
 			m.marioObj.header.gfx.animInfo.animID == MARIO_ANIM_SLIDE_KICK or 
 			m.marioObj.header.gfx.animInfo.animID == MARIO_ANIM_SLIDE or 
-			m.marioObj.header.gfx.animInfo.animID == MARIO_ANIM_START_GROUND_POUND or
-			m.marioObj.header.gfx.animInfo.animID == MARIO_ANIM_GROUND_POUND or
-			m.marioObj.header.gfx.animInfo.animID == MARIO_ANIM_GROUND_POUND_LANDING or
 			m.marioObj.header.gfx.animInfo.animID == MARIO_ANIM_TWIRL or 
 			m.marioObj.header.gfx.animInfo.animID == MARIO_ANIM_START_TWIRL or 
 			m.marioObj.header.gfx.animInfo.animID == MARIO_ANIM_SUMMON_STAR or 
@@ -373,6 +415,8 @@ if CT_GD == _G.charSelect.character_get_current_number() and m.playerIndex == 0 
 
 hook_event(HOOK_MARIO_UPDATE, anims)
 hook_event(HOOK_MARIO_UPDATE, star)
+
+
 
 
 
