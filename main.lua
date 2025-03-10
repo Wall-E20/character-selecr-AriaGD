@@ -10,7 +10,6 @@ end
 
 local E_MODEL_GD = smlua_model_util_get_id("aria_geo")
 local E_MODEL_MISTCUSTOM = smlua_model_util_get_id("mist_geo")
-local E_MODEL_GD2 = smlua_model_util_get_id("ariacat_geo")
 local TEX_CUSTOM_STAR_ICON = get_texture_info("pane-icon")
 local TEX_CUSTOM_LIFE_ICON = get_texture_info("icon-aria") 
 local E_MODEL_CUSTOM_STAR = smlua_model_util_get_id("panino_geo") 
@@ -137,29 +136,9 @@ local function on_character_select_load()
 	_G.charSelect.character_add_palette_preset(E_MODEL_GD, PALETTE_GD_MIRROR)
 	_G.charSelect.character_add_palette_preset(E_MODEL_GD, PALETTE_GD_BW)
     _G.charSelect.character_add_health_meter(CT_GD, healthMeter)
-	
-	_G.charSelect.character_add_caps(E_MODEL_GD2, CAPTABLE_GD)
-    _G.charSelect.character_add_voice(E_MODEL_GD2, VOICETABLE_GD)
-    _G.charSelect.character_add_celebration_star(E_MODEL_GD2, E_MODEL_CUSTOM_STAR, TEX_CUSTOM_STAR_ICON)
-    _G.charSelect.character_add_palette_preset(E_MODEL_GD2, PALETTE_GD)
-	_G.charSelect.character_add_palette_preset(E_MODEL_GD2, PALETTE_GD_MIRROR)
-	_G.charSelect.character_add_palette_preset(E_MODEL_GD2, PALETTE_GD_BW)
-    CSloaded = true
-
---cat mouth :3
-local SKIN_CATARIA = {
-        { model = E_MODEL_GD2,  name = "Aria :3", desc = { "mewo" , ":3" }, color = {r = 3, g = 252, b = 57} }
-    }
-
-    for index, alt in ipairs(SKIN_CATARIA) do
-        _G.charSelect.character_add_costume(CT_GD, alt.name, alt.desc, nil, alt.color, alt.model, nil, nil, nil, nil)
-    end
-    --_G.charSelect.character_add_health_meter(CT_CHAR, healthMeter)
     CSloaded = true
 
 end
-
-
 local function on_character_sound(m, sound)
     if not CSloaded then return end
     if _G.charSelect.character_get_voice(m) == VOICETABLE_GD then return _G.charSelect.voice.sound(m, sound) end
@@ -209,19 +188,38 @@ end
 
 hook_event(HOOK_ON_SET_MARIO_ACTION, before_set_character_action)
 
+
+local flyspeed = 35
 -- getpack yay
-local function mario_update2(m)
-if _G.charSelect.character_get_current_number() == CT_GD and m.flags & MARIO_WING_CAP ~= 0 and m.action & ACT_FLAG_AIR ~= 0 and m.pos.y ~= m.floorHeight -700 then
+local function jetpack(m)
+if _G.charSelect.character_get_current_number() == CT_GD and m.flags & MARIO_WING_CAP ~= 0 and m.action & ACT_FLAG_AIR ~= 0 then
     if m.controller.buttonDown & A_BUTTON ~= 0 then 
-        m.vel.y = 25 
+		m.vel.y = m.vel.y + 7
+		if m.vel.y > flyspeed then m.vel.y = flyspeed
+		end
 		m.particleFlags = m.particleFlags | PARTICLE_FIRE
 		set_mario_action(m, ACT_FREEFALL, 0)
-		--m.marioObj.header.gfx.animInfo.animID == MARIO_ANIM_A_POSE
+		 set_mario_animation(m, MARIO_ANIM_A_POSE)
     end
+
+end
+if _G.charSelect.character_get_current_number() == CT_GD and m.flags & MARIO_WING_CAP ~= 0 then 
+		if m.marioObj.header.gfx.animInfo.animID == MARIO_ANIM_GENERAL_FALL then
+		set_mario_animation(m, MARIO_ANIM_A_POSE) --here i could make a custom animation...
+		end
+	end
+if _G.charSelect.character_get_current_number() == CT_GD and m.flags & MARIO_WING_CAP ~= 0 and 
+m.action & ACT_FLAG_SWIMMING ~= 0 then
+if m.controller.buttonDown & A_BUTTON ~= 0 then 
+		m.forwardVel = m.forwardVel + 10
+		if m.forwardVel > flyspeed then m.forwardVel = flyspeed
+		end
+		m.particleFlags = m.particleFlags | PARTICLE_DUST
+end
 end
 end
 -- hooks --
-hook_event(HOOK_MARIO_UPDATE, mario_update2)
+hook_event(HOOK_MARIO_UPDATE, jetpack)
 
 
 --land (gotta fix this)
@@ -278,7 +276,6 @@ local function anims(m)
         end
 		if m.marioObj.header.gfx.animInfo.animID == MARIO_ANIM_GENERAL_FALL then
             smlua_anim_util_set_animation(m.marioObj, "gd_ffree")
-			m.marioBodyState.eyeState = 11
         end
 		if m.marioObj.header.gfx.animInfo.animID == MARIO_ANIM_START_CROUCHING then
            smlua_anim_util_set_animation(m.marioObj, "Crouch_start")
@@ -304,6 +301,7 @@ local function anims(m)
         end
 		if m.marioObj.header.gfx.animInfo.animID == MARIO_ANIM_GROUND_POUND then
            smlua_anim_util_set_animation(m.marioObj, "Spinn")
+		   m.vel.y = m.vel.y - 5
         end
 		if m.marioObj.header.gfx.animInfo.animID == MARIO_ANIM_START_GROUND_POUND then
            smlua_anim_util_set_animation(m.marioObj, "GP_frame")
