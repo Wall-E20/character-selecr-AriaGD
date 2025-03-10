@@ -188,7 +188,9 @@ end
 
 hook_event(HOOK_ON_SET_MARIO_ACTION, before_set_character_action)
 
-
+local function limit_angle(a)
+    return (a + 0x8000) % 0x10000 - 0x8000
+end
 local flyspeed = 35
 -- getpack yay
 local function jetpack(m)
@@ -197,6 +199,7 @@ if _G.charSelect.character_get_current_number() == CT_GD and m.flags & MARIO_WIN
 		m.vel.y = m.vel.y + 7
 		if m.vel.y > flyspeed then m.vel.y = flyspeed
 		end
+		   m.faceAngle.y = m.intendedYaw - approach_s32(limit_angle(m.intendedYaw - m.faceAngle.y), 0, 0x6ba, 0x6ba);
 		m.particleFlags = m.particleFlags | PARTICLE_FIRE
 		set_mario_action(m, ACT_FREEFALL, 0)
 		 set_mario_animation(m, MARIO_ANIM_A_POSE)
