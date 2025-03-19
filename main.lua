@@ -11,8 +11,8 @@ end
 local E_MODEL_GD = smlua_model_util_get_id("aria_geo")
 local E_MODEL_MISTCUSTOM = smlua_model_util_get_id("mist_geo")
 local TEX_CUSTOM_STAR_ICON = get_texture_info("pane-icon")
-local TEX_CUSTOM_LIFE_ICON = get_texture_info("icon-aria") 
-local E_MODEL_CUSTOM_STAR = smlua_model_util_get_id("panino_geo") 
+local TEX_CUSTOM_LIFE_ICON = get_texture_info("icon-aria")
+local E_MODEL_CUSTOM_STAR = smlua_model_util_get_id("panino_geo")
 
 
 
@@ -136,6 +136,7 @@ local function on_character_select_load()
 	_G.charSelect.character_add_palette_preset(E_MODEL_GD, PALETTE_GD_MIRROR)
 	_G.charSelect.character_add_palette_preset(E_MODEL_GD, PALETTE_GD_BW)
     _G.charSelect.character_add_health_meter(CT_GD, healthMeter)
+	_G.charSelect.character_add_animations(E_MODEL_GD, ANIMGD)
     CSloaded = true
 
 end
@@ -160,7 +161,7 @@ hook_event(HOOK_MARIO_UPDATE, on_character_snore)
 local function replace_jump(m, inc)
 if _G.charSelect.character_get_voice(m) == VOICETABLE_GD then
 	if inc == ACT_JUMP or inc == ACT_TRIPLE_JUMP or inc == ACT_LONG_JUMP then
-	
+
         return ACT_DOUBLE_JUMP
 	end
 end
@@ -178,13 +179,13 @@ end
 
 hook_event(HOOK_BEFORE_SET_MARIO_ACTION, before_set_character_action)
 
-
+--dive replace--
 function before_set_character_action(m)
 if m.action == ACT_JUMP_KICK and _G.charSelect.character_get_current_number() == CT_GD then
 			m.vel.y = 30
 			set_mario_action(m, ACT_DIVE, 0)
 end
-end     
+end
 
 hook_event(HOOK_ON_SET_MARIO_ACTION, before_set_character_action)
 
@@ -192,10 +193,12 @@ local function limit_angle(a)
     return (a + 0x8000) % 0x10000 - 0x8000
 end
 local flyspeed = 35
+
 -- getpack yay
 local function jetpack(m)
 if _G.charSelect.character_get_current_number() == CT_GD and m.flags & MARIO_WING_CAP ~= 0 and m.action & ACT_FLAG_AIR ~= 0 then
-    if m.controller.buttonDown & A_BUTTON ~= 0 then 
+    if m.controller.buttonDown & A_BUTTON ~= 0 then
+
 		m.vel.y = m.vel.y + 7
 		if m.vel.y > flyspeed then m.vel.y = flyspeed
 		end
@@ -206,14 +209,15 @@ if _G.charSelect.character_get_current_number() == CT_GD and m.flags & MARIO_WIN
     end
 
 end
-if _G.charSelect.character_get_current_number() == CT_GD and m.flags & MARIO_WING_CAP ~= 0 then 
+--this instead is for the water movement when jetpack
+if _G.charSelect.character_get_current_number() == CT_GD and m.flags & MARIO_WING_CAP ~= 0 then
 		if m.marioObj.header.gfx.animInfo.animID == MARIO_ANIM_GENERAL_FALL then
 		set_mario_animation(m, MARIO_ANIM_A_POSE) --here i could make a custom animation...
 		end
 	end
-if _G.charSelect.character_get_current_number() == CT_GD and m.flags & MARIO_WING_CAP ~= 0 and 
+if _G.charSelect.character_get_current_number() == CT_GD and m.flags & MARIO_WING_CAP ~= 0 and
 m.action & ACT_FLAG_SWIMMING ~= 0 then
-if m.controller.buttonDown & A_BUTTON ~= 0 then 
+if m.controller.buttonDown & A_BUTTON ~= 0 then
 		m.forwardVel = m.forwardVel + 10
 		if m.forwardVel > flyspeed then m.forwardVel = flyspeed
 		end
@@ -224,138 +228,147 @@ end
 -- hooks --
 hook_event(HOOK_MARIO_UPDATE, jetpack)
 
-
+--[[
 --land (gotta fix this)
 local function jump2(m)
 if _G.charSelect.character_get_voice(m) == VOICETABLE_GD then
-	if m.marioObj.header.gfx.animInfo.animID == MARIO_ANIM_GENERAL_LAND or 
-	m.marioObj.header.gfx.animInfo.animID == MARIO_ANIM_LAND_FROM_SINGLE_JUMP or 
-	m.marioObj.header.gfx.animInfo.animID == MARIO_ANIM_LAND_FROM_DOUBLE_JUMP or 
+	if m.marioObj.header.gfx.animInfo.animID == MARIO_ANIM_GENERAL_LAND or
+	m.marioObj.header.gfx.animInfo.animID == MARIO_ANIM_LAND_FROM_SINGLE_JUMP or
+	m.marioObj.header.gfx.animInfo.animID == MARIO_ANIM_LAND_FROM_DOUBLE_JUMP or
 	m.marioObj.header.gfx.animInfo.animID == ACT_FREEFALL_LAND then
         smlua_anim_util_set_animation(m.marioObj, "gd_stopreal")
-		
+
     end
-	
+
 end
 end
 
-hook_event(HOOK_MARIO_UPDATE, jump2) 
+hook_event(HOOK_MARIO_UPDATE, jump2)
+--]]
 
-
+--animtable!! yay!--
+local ANIMGD = {
+    [CHAR_ANIM_A_POSE] = "T-Pose",
+	--[[
+    [CHAR_ANIM_CROUCH_FROM_FAST_LONGJUMP] = "CHAR_ANIM_CROUCH_FROM_FAST_LONGJUMP",
+    [CHAR_ANIM_CROUCH_FROM_SLOW_LONGJUMP] = "CHAR_ANIM_CROUCH_FROM_SLOW_LONGJUMP",
+    [CHAR_ANIM_WALK_WITH_LIGHT_OBJ] = "CHAR_ANIM_WALK_WITH_LIGHT_OBJ",
+    [CHAR_ANIM_RUN_WITH_LIGHT_OBJ] = "CHAR_ANIM_RUN_WITH_LIGHT_OBJ",
+    [CHAR_ANIM_SLOW_WALK_WITH_LIGHT_OBJ] = "CHAR_ANIM_SLOW_WALK_WITH_LIGHT_OBJ",
+    [CHAR_ANIM_SHIVERING_WARMING_HAND] = "CHAR_ANIM_SHIVERING_WARMING_HAND",
+    [CHAR_ANIM_SHIVERING_RETURN_TO_IDLE] = "CHAR_ANIM_SHIVERING_RETURN_TO_IDLE",
+    [CHAR_ANIM_SHIVERING] = "CHAR_ANIM_SHIVERING",
+    [CHAR_ANIM_STAND_UP_FROM_LAVA_BOOST] = "CHAR_ANIM_STAND_UP_FROM_LAVA_BOOST",
+    [CHAR_ANIM_FIRE_LAVA_BURN] = "CHAR_ANIM_FIRE_LAVA_BURN",
+    [CHAR_ANIM_TAKE_CAP_OFF_THEN_ON] = "CHAR_ANIM_TAKE_CAP_OFF_THEN_ON",
+    [CHAR_ANIM_QUICKLY_PUT_CAP_ON] = "CHAR_ANIM_QUICKLY_PUT_CAP_ON",
+	--]]
+    [CHAR_ANIM_GROUND_POUND_LANDING] = "gd_stopreal",
+    [CHAR_ANIM_TRIPLE_JUMP_GROUND_POUND] = "GP_frame",
+    [CHAR_ANIM_START_GROUND_POUND] = "GP_frame",
+    [CHAR_ANIM_GROUND_POUND] = "Spinn",
+	--[[
+    [CHAR_ANIM_BOTTOM_STUCK_IN_GROUND] = "CHAR_ANIM_LEGS_STUCK_IN_GROUND",
+    [CHAR_ANIM_IDLE_WITH_LIGHT_OBJ] = "CHAR_ANIM_IDLE_WITH_LIGHT_OBJ",
+    [CHAR_ANIM_JUMP_LAND_WITH_LIGHT_OBJ] = "CHAR_ANIM_JUMP_LAND_WITH_LIGHT_OBJ",
+    [CHAR_ANIM_JUMP_WITH_LIGHT_OBJ] = "CHAR_ANIM_JUMP_WITH_LIGHT_OBJ",
+    [CHAR_ANIM_FALL_LAND_WITH_LIGHT_OBJ] = "CHAR_ANIM_FALL_LAND_WITH_LIGHT_OBJ",
+    [CHAR_ANIM_FALL_WITH_LIGHT_OBJ] = "CHAR_ANIM_FALL_WITH_LIGHT_OBJ",
+    [CHAR_ANIM_FALL_FROM_SLIDING_WITH_LIGHT_OBJ] = "CHAR_ANIM_FALL_FROM_SLIDING_WITH_LIGHT_OBJ",
+    [CHAR_ANIM_SLIDING_ON_BOTTOM_WITH_LIGHT_OBJ] = "CHAR_ANIM_SLIDING_ON_BOTTOM_WITH_LIGHT_OBJ",
+    [CHAR_ANIM_STAND_UP_FROM_SLIDING_WITH_LIGHT_OBJ] = "CHAR_ANIM_STAND_UP_FROM_SLIDING_WITH_LIGHT_OBJ",
+    [CHAR_ANIM_RIDING_SHELL] = "CHAR_ANIM_RIDING_SHELL",
+	--]]
+    [CHAR_ANIM_DOUBLE_JUMP_FALL] = "gd_jfall",
+	[CHAR_ANIM_LAND_FROM_DOUBLE_JUMP] = "gd_stopreal",
+    --[CHAR_ANIM_SINGLE_JUMP] = "CHAR_ANIM_SINGLE_JUMP",
+    [CHAR_ANIM_LAND_FROM_SINGLE_JUMP] = "gd_stopreal",
+   -- [CHAR_ANIM_AIR_KICK] = "CHAR_ANIM_AIR_KICK",
+    [CHAR_ANIM_DOUBLE_JUMP_RISE] = "gd_jstart",
+	[CHAR_ANIM_DOUBLE_JUMP_FALL] = "gd_jfall",
+    --[CHAR_ANIM_THROW_LIGHT_OBJECT] = "CHAR_ANIM_THROW_LIGHT_OBJECT",
+    [CHAR_ANIM_GENERAL_FALL] = "gd_ffree",
+    [CHAR_ANIM_GENERAL_LAND] = "gd_stopreal",
+    --[[ [CHAR_ANIM_GRAB_HEAVY_OBJECT] = "CHAR_ANIM_GRAB_HEAVY_OBJECT",
+    [CHAR_ANIM_MISSING_CAP] = "CHAR_ANIM_MISSING_CAP",
+    [CHAR_ANIM_GROUND_THROW] = "CHAR_ANIM_GROUND_THROW",
+    [CHAR_ANIM_GROUND_KICK] = "CHAR_ANIM_GROUND_KICK",
+    [CHAR_ANIM_FIRST_PUNCH] = "CHAR_ANIM_FIRST_PUNCH",
+    [CHAR_ANIM_SECOND_PUNCH] = "CHAR_ANIM_SECOND_PUNCH",
+    [CHAR_ANIM_FIRST_PUNCH_FAST] = "CHAR_ANIM_FIRST_PUNCH_FAST",
+    [CHAR_ANIM_SECOND_PUNCH_FAST] = "CHAR_ANIM_SECOND_PUNCH_FAST",
+    [CHAR_ANIM_PICK_UP_LIGHT_OBJ] = "CHAR_ANIM_PICK_UP_LIGHT_OBJ",
+    [CHAR_ANIM_PLACE_LIGHT_OBJ] = "CHAR_ANIM_PLACE_LIGHT_OBJ", --]]
+    [CHAR_ANIM_BREAKDANCE] = "Crouch_attack",
+    [CHAR_ANIM_STOP_CROUCHING] = "Crouch_end",
+    [CHAR_ANIM_START_CROUCHING] = "Crouch_start",
+    [CHAR_ANIM_CROUCHING] = "Crouch",
+    [CHAR_ANIM_CRAWLING] = "Crawl",
+    [CHAR_ANIM_STOP_CRAWLING] = "crawl_frame",
+    [CHAR_ANIM_START_CRAWLING] = "crawl_frame",
+    --[CHAR_ANIM_WALK_PANTING] = "CHAR_ANIM_WALK_PANTING",
+    --[CHAR_ANIM_WALK_WITH_HEAVY_OBJ] = "CHAR_ANIM_WALK_WITH_HEAVY_OBJ",
+    --[CHAR_ANIM_TRIPLE_JUMP_LAND] = "CHAR_ANIM_TRIPLE_JUMP_LAND",
+    --[CHAR_ANIM_TRIPLE_JUMP] = "CHAR_ANIM_TRIPLE_JUMP",
+    [CHAR_ANIM_FIRST_PERSON] = "idle",
+    [CHAR_ANIM_IDLE_HEAD_LEFT] = "idle1",
+    [CHAR_ANIM_IDLE_HEAD_RIGHT] = "idle2",
+    [CHAR_ANIM_IDLE_HEAD_CENTER] = "idle3",
+    --[CHAR_ANIM_STAR_DANCE] = "CHAR_ANIM_STAR_DANCE",
+}
 
 --standard anims
 local function anims(m)
-    if _G.charSelect.character_get_voice(m) == VOICETABLE_GD then
-        if m.marioObj.header.gfx.animInfo.animID ==  MARIO_ANIM_IDLE_HEAD_LEFT then
-            m.marioBodyState.eyeState = MARIO_EYES_LOOK_LEFT
-            smlua_anim_util_set_animation(m.marioObj, "idle1")
-        end
-        if m.marioObj.header.gfx.animInfo.animID == MARIO_ANIM_IDLE_HEAD_RIGHT then
-            smlua_anim_util_set_animation(m.marioObj, "idle2")
-			m.marioBodyState.eyeState = MARIO_EYES_LOOK_RIGHT
-        end
-        if m.marioObj.header.gfx.animInfo.animID == MARIO_ANIM_IDLE_HEAD_CENTER then
-            smlua_anim_util_set_animation(m.marioObj, "idle3")
-        end
-		if m.marioObj.header.gfx.animInfo.animID == MARIO_ANIM_FIRST_PERSON then
-            smlua_anim_util_set_animation(m.marioObj, "idle")
-        end
-		if m.marioObj.header.gfx.animInfo.animID == MARIO_ANIM_A_POSE then
-            smlua_anim_util_set_animation(m.marioObj, "T-Pose")
-        end
-		if m.marioObj.header.gfx.animInfo.animID == MARIO_ANIM_DOUBLE_JUMP_RISE then
-			m.marioBodyState.eyeState = 11
-            smlua_anim_util_set_animation(m.marioObj, "gd_jstart")
-        end
-		if m.marioBodyState.handState == MARIO_HAND_OPEN and m.marioObj.header.gfx.animInfo.animID == MARIO_ANIM_DOUBLE_JUMP_RISE then
-			 m.marioBodyState.handState = MARIO_HAND_FISTS
-		end	
-		if m.marioBodyState.handState == MARIO_HAND_OPEN and m.marioObj.header.gfx.animInfo.animID == MARIO_ANIM_DOUBLE_JUMP_FALL then
-			 m.marioBodyState.handState = MARIO_HAND_FISTS
-		end			
-		
-		if m.marioObj.header.gfx.animInfo.animID == MARIO_ANIM_DOUBLE_JUMP_FALL then
-            smlua_anim_util_set_animation(m.marioObj, "gd_jfall")
-        end
-		if m.marioObj.header.gfx.animInfo.animID == MARIO_ANIM_GENERAL_FALL then
-            smlua_anim_util_set_animation(m.marioObj, "gd_ffree")
-        end
-		if m.marioObj.header.gfx.animInfo.animID == MARIO_ANIM_START_CROUCHING then
-           smlua_anim_util_set_animation(m.marioObj, "Crouch_start")
-        end
-		if m.marioObj.header.gfx.animInfo.animID == MARIO_ANIM_CROUCHING then
-           smlua_anim_util_set_animation(m.marioObj, "Crouch")
-        end
-		if m.marioObj.header.gfx.animInfo.animID == MARIO_ANIM_STOP_CROUCHING then
-           smlua_anim_util_set_animation(m.marioObj, "Crouch_end")
-        end
-		if m.marioObj.header.gfx.animInfo.animID == MARIO_ANIM_BREAKDANCE then
-           smlua_anim_util_set_animation(m.marioObj, "Crouch_attack")
-        end
-		if m.marioObj.header.gfx.animInfo.animID == MARIO_ANIM_CRAWLING then
-           smlua_anim_util_set_animation(m.marioObj, "Crawl")
-		   m.forwardVel = math.max(m.forwardVel,10)
-        end
-		if m.marioObj.header.gfx.animInfo.animID == MARIO_ANIM_START_CRAWLING then
-           smlua_anim_util_set_animation(m.marioObj, "crawl_frame")
-        end
-		if m.marioObj.header.gfx.animInfo.animID == MARIO_ANIM_STOP_CRAWLING then
-           smlua_anim_util_set_animation(m.marioObj, "crawl_frame")
-        end
-		if m.marioObj.header.gfx.animInfo.animID == MARIO_ANIM_GROUND_POUND then
-           smlua_anim_util_set_animation(m.marioObj, "Spinn")
-		   m.vel.y = m.vel.y - 5
-        end
-		if m.marioObj.header.gfx.animInfo.animID == MARIO_ANIM_START_GROUND_POUND then
-           smlua_anim_util_set_animation(m.marioObj, "GP_frame")
-        end
-		if m.marioObj.header.gfx.animInfo.animID == MARIO_ANIM_GROUND_POUND_LANDING then
-           smlua_anim_util_set_animation(m.marioObj, "gd_stopreal")
-        end
-		--if m.marioObj.header.gfx.animInfo.animID == MARIO_ANIM_BOTTOM_STUCK_IN_GROUND then
-      --     m.marioObj.header.gfx.animInfo.animID == MARIO_ANIM_LEGS_STUCK_IN_GROUND
-       -- end
-		if 
+if m.marioBodyState.handState == MARIO_HAND_OPEN and m.marioObj.header.gfx.animInfo.animID == MARIO_ANIM_DOUBLE_JUMP_RISE then
+	 m.marioBodyState.handState = MARIO_HAND_FISTS
+end
+if m.marioBodyState.handState == MARIO_HAND_OPEN and m.marioObj.header.gfx.animInfo.animID == MARIO_ANIM_DOUBLE_JUMP_FALL then
+	 m.marioBodyState.handState = MARIO_HAND_FISTS
+end
+if m.marioObj.header.gfx.animInfo.animID == MARIO_ANIM_CRAWLING then
+   m.forwardVel = math.max(m.forwardVel,10)
+ end
+if
 			m.marioObj.header.gfx.animInfo.animID == MARIO_ANIM_CROUCH_FROM_SLOW_LONGJUMP or
 			m.marioObj.header.gfx.animInfo.animID == MARIO_ANIM_CROUCH_FROM_FAST_LONGJUMP or
 			m.marioObj.header.gfx.animInfo.animID == MARIO_ANIM_SLOW_LONGJUMP or
 			m.marioObj.header.gfx.animInfo.animID == MARIO_ANIM_FAST_LONGJUMP or
-			m.marioObj.header.gfx.animInfo.animID == MARIO_ANIM_BACKFLIP or 
-			m.marioObj.header.gfx.animInfo.animID == MARIO_ANIM_SINGLE_JUMP or 
+			m.marioObj.header.gfx.animInfo.animID == MARIO_ANIM_BACKFLIP or
+			m.marioObj.header.gfx.animInfo.animID == MARIO_ANIM_SINGLE_JUMP or
 			m.marioObj.header.gfx.animInfo.animID == MARIO_ANIM_HANDSTAND_JUMP or
 			m.marioObj.header.gfx.animInfo.animID == MARIO_ANIM_WALK_WITH_LIGHT_OBJ or
-			m.marioObj.header.gfx.animInfo.animID == MARIO_ANIM_SINGLE_JUMP or 
-			m.marioObj.header.gfx.animInfo.animID == MARIO_ANIM_RUN_WITH_LIGHT_OBJ or 
-			m.marioObj.header.gfx.animInfo.animID == MARIO_ANIM_CREDITS_LOOK_UP or 
-			m.marioObj.header.gfx.animInfo.animID == MARIO_ANIM_FINAL_BOWSER_RAISE_HAND_SPIN or 
-			m.marioObj.header.gfx.animInfo.animID == MARIO_ANIM_WING_CAP_FLY or 
-			m.marioObj.header.gfx.animInfo.animID == MARIO_ANIM_CREDITS_PEACE_SIGN or 
-			m.marioObj.header.gfx.animInfo.animID == MARIO_ANIM_HANG_ON_OWL or 
-			m.marioObj.header.gfx.animInfo.animID == MARIO_ANIM_THROW_CATCH_KEY or 
-			m.marioObj.header.gfx.animInfo.animID == MARIO_ANIM_AIR_KICK or  
-			m.marioObj.header.gfx.animInfo.animID == MARIO_ANIM_IDLE_WITH_LIGHT_OBJ or 
-			m.marioObj.header.gfx.animInfo.animID == MARIO_ANIM_JUMP_WITH_LIGHT_OBJ or 
-			m.marioObj.header.gfx.animInfo.animID == MARIO_ANIM_FALL_WITH_LIGHT_OBJ or 
-			m.marioObj.header.gfx.animInfo.animID == MARIO_ANIM_RIDING_SHELL or 
-			m.marioObj.header.gfx.animInfo.animID == MARIO_ANIM_BEND_KNESS_RIDING_SHELL or 
-			m.marioObj.header.gfx.animInfo.animID == MARIO_ANIM_START_RIDING_SHELL or 
-			m.marioObj.header.gfx.animInfo.animID == MARIO_ANIM_JUMP_RIDING_SHELL or 
-			m.marioObj.header.gfx.animInfo.animID == MARIO_ANIM_DOUBLE_JUMP_FALL or 
-			m.marioObj.header.gfx.animInfo.animID == MARIO_ANIM_DOUBLE_JUMP_RISE or 
-			m.marioObj.header.gfx.animInfo.animID == MARIO_ANIM_THROW_LIGHT_OBJECT or 
-			m.marioObj.header.gfx.animInfo.animID == MARIO_ANIM_UNLOCK_DOOR or 
-			m.marioObj.header.gfx.animInfo.animID == MARIO_ANIM_GROUND_KICK or 
-			m.marioObj.header.gfx.animInfo.animID == MARIO_ANIM_FIRST_PUNCH or 
-			m.marioObj.header.gfx.animInfo.animID == MARIO_ANIM_BREAKDANCE or 
-			m.marioObj.header.gfx.animInfo.animID == MARIO_ANIM_DIVE or 
-			m.marioObj.header.gfx.animInfo.animID == MARIO_ANIM_SLIDE_DIVE or 
-			m.marioObj.header.gfx.animInfo.animID == MARIO_ANIM_SLIDE_KICK or 
-			m.marioObj.header.gfx.animInfo.animID == MARIO_ANIM_SLIDE or 
-			m.marioObj.header.gfx.animInfo.animID == MARIO_ANIM_TWIRL or 
-			m.marioObj.header.gfx.animInfo.animID == MARIO_ANIM_START_TWIRL or 
-			m.marioObj.header.gfx.animInfo.animID == MARIO_ANIM_SUMMON_STAR or 
-			m.marioObj.header.gfx.animInfo.animID == MARIO_ANIM_HOLDING_BOWSER or 
-			m.marioObj.header.gfx.animInfo.animID == MARIO_ANIM_RELEASE_BOWSER or 
+			m.marioObj.header.gfx.animInfo.animID == MARIO_ANIM_SINGLE_JUMP or
+			m.marioObj.header.gfx.animInfo.animID == MARIO_ANIM_RUN_WITH_LIGHT_OBJ or
+			m.marioObj.header.gfx.animInfo.animID == MARIO_ANIM_CREDITS_LOOK_UP or
+			m.marioObj.header.gfx.animInfo.animID == MARIO_ANIM_FINAL_BOWSER_RAISE_HAND_SPIN or
+			m.marioObj.header.gfx.animInfo.animID == MARIO_ANIM_WING_CAP_FLY or
+			m.marioObj.header.gfx.animInfo.animID == MARIO_ANIM_CREDITS_PEACE_SIGN or
+			m.marioObj.header.gfx.animInfo.animID == MARIO_ANIM_HANG_ON_OWL or
+			m.marioObj.header.gfx.animInfo.animID == MARIO_ANIM_THROW_CATCH_KEY or
+			m.marioObj.header.gfx.animInfo.animID == MARIO_ANIM_AIR_KICK or
+			m.marioObj.header.gfx.animInfo.animID == MARIO_ANIM_IDLE_WITH_LIGHT_OBJ or
+			m.marioObj.header.gfx.animInfo.animID == MARIO_ANIM_JUMP_WITH_LIGHT_OBJ or
+			m.marioObj.header.gfx.animInfo.animID == MARIO_ANIM_FALL_WITH_LIGHT_OBJ or
+			m.marioObj.header.gfx.animInfo.animID == MARIO_ANIM_RIDING_SHELL or
+			m.marioObj.header.gfx.animInfo.animID == MARIO_ANIM_BEND_KNESS_RIDING_SHELL or
+			m.marioObj.header.gfx.animInfo.animID == MARIO_ANIM_START_RIDING_SHELL or
+			m.marioObj.header.gfx.animInfo.animID == MARIO_ANIM_JUMP_RIDING_SHELL or
+			m.marioObj.header.gfx.animInfo.animID == MARIO_ANIM_DOUBLE_JUMP_FALL or
+			m.marioObj.header.gfx.animInfo.animID == MARIO_ANIM_DOUBLE_JUMP_RISE or
+			m.marioObj.header.gfx.animInfo.animID == MARIO_ANIM_THROW_LIGHT_OBJECT or
+			m.marioObj.header.gfx.animInfo.animID == MARIO_ANIM_UNLOCK_DOOR or
+			m.marioObj.header.gfx.animInfo.animID == MARIO_ANIM_GROUND_KICK or
+			m.marioObj.header.gfx.animInfo.animID == MARIO_ANIM_FIRST_PUNCH or
+			m.marioObj.header.gfx.animInfo.animID == MARIO_ANIM_BREAKDANCE or
+			m.marioObj.header.gfx.animInfo.animID == MARIO_ANIM_DIVE or
+			m.marioObj.header.gfx.animInfo.animID == MARIO_ANIM_SLIDE_DIVE or
+			m.marioObj.header.gfx.animInfo.animID == MARIO_ANIM_SLIDE_KICK or
+			m.marioObj.header.gfx.animInfo.animID == MARIO_ANIM_SLIDE or
+			m.marioObj.header.gfx.animInfo.animID == MARIO_ANIM_TWIRL or
+			m.marioObj.header.gfx.animInfo.animID == MARIO_ANIM_START_TWIRL or
+			m.marioObj.header.gfx.animInfo.animID == MARIO_ANIM_SUMMON_STAR or
+			m.marioObj.header.gfx.animInfo.animID == MARIO_ANIM_HOLDING_BOWSER or
+			m.marioObj.header.gfx.animInfo.animID == MARIO_ANIM_RELEASE_BOWSER or
 			m.marioObj.header.gfx.animInfo.animID == MARIO_ANIM_SLIDEFLIP or
 			m.marioObj.header.gfx.animInfo.animID == MARIO_ANIM_TRIPLE_JUMP or
 			m.marioObj.header.gfx.animInfo.animID == MARIO_ANIM_THROW_LIGHT_OBJECT or
@@ -365,19 +378,19 @@ local function anims(m)
 			m.marioObj.header.gfx.animInfo.animID == MARIO_ANIM_PUT_CAP_ON or
 			m.marioObj.header.gfx.animInfo.animID == MARIO_ANIM_TRIPLE_JUMP_FLY then
             m.marioBodyState.eyeState = 11
-        end
+ end
 		if
 			m.marioObj.header.gfx.animInfo.animID == MARIO_ANIM_CREDITS_WAVING or
-			m.marioObj.header.gfx.animInfo.animID == MARIO_ANIM_CREDITS_PEACE_SIGN or	
-			m.marioObj.header.gfx.animInfo.animID == MARIO_ANIM_RETURN_FROM_WATER_STAR_DANCE then			
+			m.marioObj.header.gfx.animInfo.animID == MARIO_ANIM_CREDITS_PEACE_SIGN or
+			m.marioObj.header.gfx.animInfo.animID == MARIO_ANIM_RETURN_FROM_WATER_STAR_DANCE then
             m.marioBodyState.eyeState = 9
         end
 		if 	m.marioObj.header.gfx.animInfo.animID == MARIO_ANIM_COUGHING or
 			m.marioObj.header.gfx.animInfo.animID == MARIO_ANIM_DYING_FALL_OVER or
 			m.marioObj.header.gfx.animInfo.animID == MARIO_ANIM_LEGS_STUCK_IN_GROUND or
 			m.marioObj.header.gfx.animInfo.animID == MARIO_ANIM_BEING_GRABBED or
-			m.marioObj.header.gfx.animInfo.animID == MARIO_ANIM_SOFT_FRONT_KB or 
-			m.marioObj.header.gfx.animInfo.animID == MARIO_ANIM_COUGHING or 
+			m.marioObj.header.gfx.animInfo.animID == MARIO_ANIM_SOFT_FRONT_KB or
+			m.marioObj.header.gfx.animInfo.animID == MARIO_ANIM_COUGHING or
 			m.marioObj.header.gfx.animInfo.animID == MARIO_ANIM_DYING_IN_QUICKSAND or
 			m.marioObj.header.gfx.animInfo.animID == MARIO_ANIM_GROUND_BONK or
 			m.marioObj.header.gfx.animInfo.animID == MARIO_ANIM_BOTTOM_STUCK_IN_GROUND or
@@ -393,12 +406,13 @@ local function anims(m)
 			m.marioObj.header.gfx.animInfo.animID == MARIO_ANIM_FORWARD_KB or
 			m.marioObj.header.gfx.animInfo.animID == MARIO_ANIM_LAND_ON_STOMACH or
 			m.marioObj.header.gfx.animInfo.animID == MARIO_ANIM_AIRBORNE_ON_STOMACH or
-			m.marioObj.header.gfx.animInfo.animID == MARIO_ANIM_SOFT_BACK_KB then			
+			m.marioObj.header.gfx.animInfo.animID == MARIO_ANIM_SOFT_BACK_KB then
             m.marioBodyState.eyeState = MARIO_EYES_DEAD
         end
     end
-end
 
+
+--star anim expressions
 local function star(m)
 if CT_GD == _G.charSelect.character_get_current_number() and m.playerIndex == 0 and
 	m.marioObj.header.gfx.animInfo.animID == MARIO_ANIM_STAR_DANCE or m.marioObj.header.gfx.animInfo.animID == MARIO_ANIM_WATER_STAR_DANCE and
@@ -417,10 +431,6 @@ if CT_GD == _G.charSelect.character_get_current_number() and m.playerIndex == 0 
 hook_event(HOOK_MARIO_UPDATE, anims)
 hook_event(HOOK_MARIO_UPDATE, star)
 
-
-
-
-
 local character_edit = _G.charSelect.character_edit
 local character_get_current_number = _G.charSelect.character_get_current_number
 local character_get_current_table = _G.charSelect.character_get_current_table
@@ -428,6 +438,9 @@ local get_options_status = _G.charSelect.get_options_status
 local get_menu_color = _G.charSelect.get_menu_color
 local hook_render_in_menu = _G.charSelect.hook_render_in_menu
 
+
+
+--pose in the CS menu 
 local function menupose(m)
 if _G.charSelect.is_menu_open() and
  CT_GD == _G.charSelect.character_get_current_number() and m.playerIndex == 0  then
