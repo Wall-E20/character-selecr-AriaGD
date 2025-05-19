@@ -205,30 +205,22 @@ local VOICETABLE_GD = {
 }
 
 --single jump / no long jump
-local function replace_jump(m, inc)
+local function movesetts(m, inc, action)
 
-		if inc == ACT_JUMP or inc == ACT_TRIPLE_JUMP or inc == ACT_LONG_JUMP then
+	if inc == ACT_JUMP or inc == ACT_TRIPLE_JUMP or inc == ACT_LONG_JUMP then
 			return ACT_DOUBLE_JUMP
-		end
-end
-
-
-
---groundpound fix by xxLuigiGamerx (Thankyou!!1)
-function before_set_character_action1(m, action)
+	end
 	if m.action == ACT_GROUND_POUND_LAND and action == ACT_BUTT_SLIDE_STOP then
 		return ACT_IDLE -- Either return a custom action or skip the action entirely by returning `ACT_IDLE` instead
 	end
 end
-
-
---dive replace--
-function before_set_character_action(m)
+local function dive(m)
 	if m.action == ACT_JUMP_KICK then
 		m.vel.y = 30
 		set_mario_action(m, ACT_DIVE, 0)
 	end
 end
+
 
 
 local function limit_angle(a)
@@ -282,10 +274,9 @@ local function on_character_select_load()
 	_G.charSelect.character_add_health_meter(CT_GD, healthMeter)
 	_G.charSelect.character_add_animations(E_MODEL_GD, ANIMGD)
 	_G.charSelect.character_set_category(CT_GD, "Squishy Workshop")
-	_G.charSelect.character_hook_moveset (CT_GD, HOOK_BEFORE_SET_MARIO_ACTION, replace_jump)
+	_G.charSelect.character_hook_moveset (CT_GD, HOOK_BEFORE_SET_MARIO_ACTION, movesetts)
+	_G.charSelect.character_hook_moveset (CT_GD, HOOK_BEFORE_MARIO_UPDATE, dive)
 	_G.charSelect.character_hook_moveset (CT_GD, HOOK_MARIO_UPDATE, jetpack) 
-	_G.charSelect.character_hook_moveset (CT_GD, HOOK_BEFORE_SET_MARIO_ACTION, before_set_character_action)
-	_G.charSelect.character_hook_moveset (CT_GD, HOOK_BEFORE_SET_MARIO_ACTION, before_set_character_action1)
 
 	CSloaded = true
 end
