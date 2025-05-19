@@ -80,7 +80,9 @@ local ANIMGD = {
 	[CHAR_ANIM_IDLE_HEAD_RIGHT] = "idle2",
 	[CHAR_ANIM_IDLE_HEAD_CENTER] = "idle3",
 	--[CHAR_ANIM_STAR_DANCE] = "CHAR_ANIM_STAR_DANCE",
+	[charSelect.CS_ANIM_MENU] = "gd_MenuPose",
 }
+
 
 
 local E_MODEL_GD = smlua_model_util_get_id("aria_geo")
@@ -202,67 +204,32 @@ local VOICETABLE_GD = {
 	--]]
 }
 
-local CSloaded = false
-local function on_character_select_load()
-	CT_GD = _G.charSelect.character_add("Aria", { "what is she doing here?? lmao", "A girl from Geometry Dash" },
-		"Wall_E20", { r = 3, g = 252, b = 57 }, E_MODEL_GD, CT_LUIGI, TEX_CUSTOM_LIFE_ICON)
-	_G.charSelect.character_add_caps(E_MODEL_GD, CAPTABLE_GD)
-	_G.charSelect.character_add_voice(E_MODEL_GD, VOICETABLE_GD)
-	_G.charSelect.character_add_celebration_star(E_MODEL_GD, E_MODEL_CUSTOM_STAR, TEX_CUSTOM_STAR_ICON)
-	_G.charSelect.character_add_palette_preset(E_MODEL_GD, PALETTE_GD)
-	_G.charSelect.character_add_palette_preset(E_MODEL_GD, PALETTE_GD_MIRROR)
-	_G.charSelect.character_add_palette_preset(E_MODEL_GD, PALETTE_GD_BW)
-	_G.charSelect.character_add_health_meter(CT_GD, healthMeter)
-	_G.charSelect.character_add_animations(E_MODEL_GD, ANIMGD)
-	CSloaded = true
-end
-local function on_character_sound(m, sound)
-	if not CSloaded then return end
-	if _G.charSelect.character_get_voice(m) == VOICETABLE_GD then return _G.charSelect.voice.sound(m, sound) end
-end
-
-local function on_character_snore(m)
-	if not CSloaded then return end
-	if _G.charSelect.character_get_voice(m) == VOICETABLE_GD then return _G.charSelect.voice.snore(m) end
-end
-
-
-hook_event(HOOK_ON_MODS_LOADED, on_character_select_load)
-hook_event(HOOK_CHARACTER_SOUND, on_character_sound)
-hook_event(HOOK_MARIO_UPDATE, on_character_snore)
-
-
-
 --single jump / no long jump
 local function replace_jump(m, inc)
-	if _G.charSelect.character_get_voice(m) == VOICETABLE_GD then
+
 		if inc == ACT_JUMP or inc == ACT_TRIPLE_JUMP or inc == ACT_LONG_JUMP then
 			return ACT_DOUBLE_JUMP
 		end
-	end
 end
 
-hook_event(HOOK_BEFORE_SET_MARIO_ACTION, replace_jump)
 
 
 --groundpound fix by xxLuigiGamerx (Thankyou!!1)
-function before_set_character_action(m, action)
-	if m.action == ACT_GROUND_POUND_LAND and action == ACT_BUTT_SLIDE_STOP and _G.charSelect.character_get_current_number() == CT_GD then
+function before_set_character_action1(m, action)
+	if m.action == ACT_GROUND_POUND_LAND and action == ACT_BUTT_SLIDE_STOP then
 		return ACT_IDLE -- Either return a custom action or skip the action entirely by returning `ACT_IDLE` instead
 	end
 end
 
-hook_event(HOOK_BEFORE_SET_MARIO_ACTION, before_set_character_action)
 
 --dive replace--
 function before_set_character_action(m)
-	if m.action == ACT_JUMP_KICK and _G.charSelect.character_get_current_number() == CT_GD then
+	if m.action == ACT_JUMP_KICK then
 		m.vel.y = 30
 		set_mario_action(m, ACT_DIVE, 0)
 	end
 end
 
-hook_event(HOOK_ON_SET_MARIO_ACTION, before_set_character_action)
 
 local function limit_angle(a)
 	return (a + 0x8000) % 0x10000 - 0x8000
@@ -271,7 +238,7 @@ local flyspeed = 35
 
 -- getpack yay
 local function jetpack(m)
-	if _G.charSelect.character_get_current_number() == CT_GD and m.flags & MARIO_WING_CAP ~= 0 and m.action & ACT_FLAG_AIR ~= 0 then
+	if m.flags & MARIO_WING_CAP ~= 0 and m.action & ACT_FLAG_AIR ~= 0 then
 		if m.controller.buttonDown & A_BUTTON ~= 0 then
 			m.vel.y = m.vel.y + 7
 			if m.vel.y > flyspeed then
@@ -284,12 +251,12 @@ local function jetpack(m)
 		end
 	end
 	--this instead is for the water movement when jetpack
-	if _G.charSelect.character_get_current_number() == CT_GD and m.flags & MARIO_WING_CAP ~= 0 then
+	if m.flags & MARIO_WING_CAP ~= 0 then
 		if m.marioObj.header.gfx.animInfo.animID == MARIO_ANIM_GENERAL_FALL then
 			set_mario_animation(m, MARIO_ANIM_A_POSE) --here i could make a custom animation...
 		end
 	end
-	if _G.charSelect.character_get_current_number() == CT_GD and m.flags & MARIO_WING_CAP ~= 0 and
+	if m.flags & MARIO_WING_CAP ~= 0 and
 		m.action & ACT_FLAG_SWIMMING ~= 0 then
 		if m.controller.buttonDown & A_BUTTON ~= 0 then
 			m.forwardVel = m.forwardVel + 10
@@ -300,8 +267,50 @@ local function jetpack(m)
 		end
 	end
 end
--- hooks --
-hook_event(HOOK_MARIO_UPDATE, jetpack)
+
+
+local CSloaded = false
+local function on_character_select_load()
+	CT_GD = _G.charSelect.character_add("Aria", { "what is she doing here?? lmao", "A girl from Geometry Dash" },
+		"Wall_E20", { r = 3, g = 252, b = 57 }, E_MODEL_GD, CT_LUIGI, TEX_CUSTOM_LIFE_ICON)
+	_G.charSelect.character_add_caps(E_MODEL_GD, CAPTABLE_GD)
+	_G.charSelect.character_add_voice(E_MODEL_GD, VOICETABLE_GD)
+	_G.charSelect.character_add_celebration_star(E_MODEL_GD, E_MODEL_CUSTOM_STAR, TEX_CUSTOM_STAR_ICON)
+	_G.charSelect.character_add_palette_preset(E_MODEL_GD, PALETTE_GD)
+	_G.charSelect.character_add_palette_preset(E_MODEL_GD, PALETTE_GD_MIRROR)
+	_G.charSelect.character_add_palette_preset(E_MODEL_GD, PALETTE_GD_BW)
+	_G.charSelect.character_add_health_meter(CT_GD, healthMeter)
+	_G.charSelect.character_add_animations(E_MODEL_GD, ANIMGD)
+	_G.charSelect.character_set_category(CT_GD, "Squishy Workshop")
+	_G.charSelect.character_hook_moveset (CT_GD, HOOK_BEFORE_SET_MARIO_ACTION, replace_jump)
+	_G.charSelect.character_hook_moveset (CT_GD, HOOK_MARIO_UPDATE, jetpack) 
+	_G.charSelect.character_hook_moveset (CT_GD, HOOK_BEFORE_SET_MARIO_ACTION, before_set_character_action)
+	_G.charSelect.character_hook_moveset (CT_GD, HOOK_BEFORE_SET_MARIO_ACTION, before_set_character_action1)
+
+	CSloaded = true
+end
+local function on_character_sound(m, sound)
+	if not CSloaded then return end
+	if _G.charSelect.character_get_voice(m) == VOICETABLE_GD then return _G.charSelect.voice.sound(m, sound) end
+end
+
+local function on_character_snore(m)
+	if not CSloaded then return end
+	if _G.charSelect.character_get_voice(m) == VOICETABLE_GD then return _G.charSelect.voice.snore(m) end
+end
+
+local function eyesidle(m)
+	if CT_GD == _G.charSelect.character_get_current_number() and m.playerIndex == 0 then
+	if 	m.marioObj.header.gfx.animInfo.animID == MARIO_ANIM_IDLE_HEAD_LEFT then
+		m.marioBodyState.eyeState = 4
+	end
+	if 	m.marioObj.header.gfx.animInfo.animID == MARIO_ANIM_IDLE_HEAD_RIGHT then
+		m.marioBodyState.eyeState = 5
+	end
+end
+end
+hook_event(HOOK_MARIO_UPDATE, eyesidle)
+
 
 --[[
 --land (gotta fix this)
@@ -449,7 +458,6 @@ local hook_render_in_menu = _G.charSelect.hook_render_in_menu
 local function menupose(m)
 	if _G.charSelect.is_menu_open() and
 		CT_GD == _G.charSelect.character_get_current_number() and m.playerIndex == 0 then
-		smlua_anim_util_set_animation(m.marioObj, "gd_MenuPose")
 		m.marioBodyState.eyeState = 9
 		m.marioBodyState.handState = MARIO_HAND_PEACE_SIGN
 	end
@@ -458,3 +466,7 @@ end
 
 
 hook_event(HOOK_MARIO_UPDATE, menupose)
+
+hook_event(HOOK_ON_MODS_LOADED, on_character_select_load)
+hook_event(HOOK_CHARACTER_SOUND, on_character_sound)
+hook_event(HOOK_MARIO_UPDATE, on_character_snore)
