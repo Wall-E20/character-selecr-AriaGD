@@ -86,7 +86,6 @@ local ANIMGD = {
 
 
 local E_MODEL_GD = smlua_model_util_get_id("aria_geo")
-local E_MODEL_MISTCUSTOM = smlua_model_util_get_id("mist_geo")
 local TEX_CUSTOM_STAR_ICON = get_texture_info("pane-icon")
 local TEX_CUSTOM_LIFE_ICON = get_texture_info("icon-aria")
 local E_MODEL_CUSTOM_STAR = smlua_model_util_get_id("panino_geo")
